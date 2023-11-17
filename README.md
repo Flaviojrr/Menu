@@ -8,7 +8,7 @@ Before running the application, ensure you have the following software installed
 
 * Java Development Kit (JDK) 8 or later
 * <a href="https://tomcat.apache.org/download-90.cgi">Apache Tomcat 9</a>
-* <a href="https://sourceforge.net/projects/hsqldb/files/"> HSQL Database</a>
+* <a href="https://www.enterprisedb.com/downloads/postgres-postgresql-downloads"> PostgreSQL Database</a>
   
 ## Getting Started
 
@@ -23,7 +23,9 @@ Set up the database:
 
 Build the project:
 
-* We chose to use <a href="https://www.eclipse.org/downloads/packages/release/2023-09/r/eclipse-ide-enterprise-java-and-web-developers">Eclipse IDE for Enterprise Java and Web Developers</a> to make the project and tutorial. 
+* We chose to use <a href="https://www.eclipse.org/downloads/packages/release/2023-09/r/eclipse-ide-enterprise-java-and-web-developers">Eclipse IDE for Enterprise Java and Web Developers</a> to make the project and tutorial.
+
+1. Configure the Server in Eclipse IDE >> Servers >> New Server >> Apache Tomcat v9.0 Server >> Browse extracted zip directory. 
 
 ...
 
