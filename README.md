@@ -7,9 +7,9 @@ This is a Java web application built with JSP (JavaServer Pages) for creating, u
 Before running the application, ensure you have the following software installed:
 
 * Java Development Kit (JDK) 8 or later
-* Apache Tomcat 9
-* HSQL Database
-
+* <a href="https://tomcat.apache.org/download-90.cgi">Apache Tomcat 9</a>
+* <a href="https://sourceforge.net/projects/hsqldb/files/"> HSQL Database</a>
+  
 ## Getting Started
 
 Clone the repository:
@@ -22,6 +22,8 @@ Set up the database:
 ...
 
 Build the project:
+
+* We chose to use <a href="https://www.eclipse.org/downloads/packages/release/2023-09/r/eclipse-ide-enterprise-java-and-web-developers">Eclipse IDE for Enterprise Java and Web Developers</a> to make the project and tutorial. 
 
 ...
 
