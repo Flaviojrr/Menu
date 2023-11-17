@@ -1,4 +1,4 @@
-# Meal and Restaurant Orders CRUD Application
+# Meal and Restaurant Orders CRUD Application 🍽️
 
 ## Overview
 This is a Java web application built with JSP (JavaServer Pages) for creating, updating, and deleting (CRUD) meals and restaurant orders. The project uses Apache Tomcat 9 as the web server and HSQL as the embedded database.
