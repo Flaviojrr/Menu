@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Novo prato</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="container-menu">
+        <p>Villa Eleganza</p>
+    </header>
+    <main>
+        <div id="box-main">
+            <form action="insert" method="get" class="formNovoPrato" name="frmNovoPrato">
+                <table>
+                    <tr>
+                        <td><p>Nome: </p><input type="text" name="name"></td>
+                    </tr>
+                    <tr>
+                        <td><p>Ingredientes: </p><input type="text" name="ingredients"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>Tipo: </p>
+                            <select name="type" id="">
+                                <option value=""></option>
+                                <option value="entrada">Entrada</option>
+                                <option value="principal">Principal</option>
+                                <option value="sobremesa">Sobremesa</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- Use type="submit" to submit the form -->
+                            <input type="submit" value="Adicionar" class="botao" onclick="return validateMenuItem()"> <!--Redirects to JS Script-->
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </main>
+    <script src="script/MenuValidator.js"></script>
+</body>
+</html>
