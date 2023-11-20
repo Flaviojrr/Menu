@@ -184,3 +184,17 @@ ul li {
     cursor: pointer;
     margin-top: 10px; /* Add space between buttons */
 }
+
+.edit-button {
+    background-color: #3498DB; /* Blue color for edit button */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Center the edit button */
+.edit-button-container {
+    text-align: center;
+}

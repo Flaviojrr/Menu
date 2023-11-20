@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DAOMenuItem {
-	
-	//Adjust database information accordingly
+
     private String driver = "org.postgresql.Driver";
     private String url = "jdbc:postgresql://localhost:5432/VillaEleganza";
     private String user = "postgres";
@@ -18,47 +17,41 @@ public class DAOMenuItem {
 
     public DAOMenuItem() {
         try {
-            // Load the JDBC driver
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    // Establish a database connection
     public Connection connect() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(url + "?charset=utf8", user, password);
     }
 
-    // Test the database connection
+
     public void testConnection() {
         try (Connection con = connect()) {
-            System.out.println("O banco de dados está conectado.");
+            System.out.println("Conexão com o banco de dados estabelecida.");
         } catch (SQLException e) {
-            System.out.println(e);
+            handleSQLException(e);
         }
     }
-    
-    // Insert a new menu item into the database
+
     public void insertMenuItem(MenuItem novoPrato) {
         try (Connection con = connect();
              PreparedStatement statement = con.prepareStatement("INSERT INTO menu (name, ingredients, type) VALUES (?, ?, ?)")) {
 
-            // Set parameters for the SQL query
             statement.setString(1, novoPrato.getName());
             statement.setString(2, novoPrato.getIngredients());
             statement.setString(3, novoPrato.getType());
 
-            // Execute the SQL query to insert the new menu item
             statement.executeUpdate();
 
             System.out.println("Novo prato inserido com sucesso!");
         } catch (SQLException e) {
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
-    // Retrieve menu items from the database
     public List<MenuItem> getMenuItems() {
         List<MenuItem> menuItems = new ArrayList<>();
 
@@ -75,7 +68,7 @@ public class DAOMenuItem {
                 menuItems.add(menu);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            handleSQLException(e);
         }
 
         return menuItems;
@@ -88,8 +81,55 @@ public class DAOMenuItem {
                 statement.setInt(1, id);
                 statement.executeUpdate();
             }
+        } catch (SQLException e) {
+            handleSQLException(e);
         }
     }
 
-    // We are adding other methods for CRUD operations can be added here
+    public MenuItem getMenuItemById(String id) {
+        try (Connection con = connect();
+             PreparedStatement statement = con.prepareStatement("SELECT * FROM menu WHERE id = ?")) {
+
+            int itemId = Integer.parseInt(id);
+            statement.setInt(1, itemId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    MenuItem menuItem = new MenuItem(
+                            rs.getString("name"),
+                            rs.getString("ingredients"),
+                            rs.getString("type"));
+                    menuItem.setId(String.valueOf(rs.getInt("id")));
+                    return menuItem;
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+
+        return null;
+    }
+
+    public boolean updateMenuItem(int id, MenuItem updatedMenuItem) {
+        try (Connection connection = connect()) {
+            String sql = "UPDATE menu SET name=?, ingredients=?, type=? WHERE id=?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, updatedMenuItem.getName());
+                statement.setString(2, updatedMenuItem.getIngredients());
+                statement.setString(3, updatedMenuItem.getType());
+                statement.setInt(4, id);
+
+                int rowsAffected = statement.executeUpdate();
+                return rowsAffected > 0;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return false;
+        }
+    }
+
+    private void handleSQLException(SQLException e) {
+        e.printStackTrace();
+        System.out.println("Erro na execução do SQL: " + e.getMessage());
+    }
 }

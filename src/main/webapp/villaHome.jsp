@@ -1,9 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=utf-8"
-    pageEncoding="utf-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang ="pt-br">
 <head>
-<meta charset="utf-8">
 <title>Villa Eleganza</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +14,7 @@
 		<div id="menu">
 			<ul>
 				<li>
-					<a href="main" class="option-menu">Cardapio</a>
+					<a href="main" class="option-menu">Cardápio</a>
 				</li>
 				<li>
 					<a href="" class="option-menu">Pedidos</a>

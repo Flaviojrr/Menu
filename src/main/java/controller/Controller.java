@@ -17,112 +17,155 @@ import model.MenuItem;
 
 @WebServlet(urlPatterns = { "/Controller", "/main", "/insert", "/update", "/delete" })
 public class Controller extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	private DAOMenuItem DAOMenuItem;
+    private static final long serialVersionUID = 1L;
+    private DAOMenuItem daoMenuItem;
 
-	public Controller() {
-		super();
-		DAOMenuItem = new DAOMenuItem();
-	}
+    public Controller() {
+        super();
+        daoMenuItem = new DAOMenuItem();
+    }
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String action = request.getServletPath();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+    	response.setContentType("text/html; charset=UTF-8");
+    	response.setCharacterEncoding("UTF-8");
 
-		try (Connection con = DAOMenuItem.connect()) {
-			System.out.println("Conexão estabelecida com o banco de dados.");
+        String action = request.getServletPath();
 
-			switch (action) {
-			case "/main":
-				displayMenu(request, response);
-				break;
-			case "/insert":
-				insertMenuItem(request, response);
-				break;
-			case "/update":
-				updateMenuItem(request, response);
-				break;
-			case "/delete":
-				deleteMenuItem(request, response);
-				break;
-			default:
-				response.sendRedirect("villaHome.jsp");
-				break;
-			}
-		} catch (Exception e) {
-			System.out.println("A conexão não pôde ser estabelecida com o banco de dados.");
-			e.printStackTrace();
-		}
-	}
+        try (Connection con = daoMenuItem.connect()) {
+            System.out.println("Conexão com o banco de dados estabelecida.");
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String action = request.getParameter("action");
+            switch (action) {
+                case "/main":
+                    displayMenu(request, response);
+                    break;
+                case "/insert":
+                    insertMenuItem(request, response);
+                    break;
+                case "/update":
+                    showUpdateForm(request, response);
+                    break;
+                case "/delete":
+                    deleteMenuItem(request, response);
+                    break;
+                default:
+                    response.sendRedirect("villaHome.jsp");
+                    break;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		switch (action) {
-		case "delete":
-			deleteMenuItem(request, response);
-			break;
-		default:
-			response.sendRedirect("villaHome.jsp");
-			break;
-		}
-	}
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        response.setContentType("text/html; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8"); 
 
-	private void displayMenu(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+        String action = request.getParameter("action");
 
-		// Retrieve menu items from the database using DAOMenuItem
-		List<MenuItem> menuItems = DAOMenuItem.getMenuItems();
+        switch (action) {
+            case "update":
+                try {
+                    updateMenuItem(request, response);
+                } catch (ServletException | IOException | SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "delete":
+                deleteMenuItem(request, response);
+                break;
+            default:
+                response.sendRedirect("villaHome.jsp");
+                break;
+        }
+    }
 
-		// Set menuItems as an attribute in the request
-		request.setAttribute("menuItems", menuItems);
+    private void displayMenu(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<MenuItem> menuItems = daoMenuItem.getMenuItems();
+        request.setAttribute("menuItems", menuItems);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("displayMenu.jsp");
+        dispatcher.forward(request, response);
+    }
 
-		// Forward the request to the JSP page for displaying menu items
-		RequestDispatcher dispatcher = request.getRequestDispatcher("displayMenu.jsp");
-		dispatcher.forward(request, response);
-	}
+    private void insertMenuItem(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String name = request.getParameter("name");
+        String ingredients = request.getParameter("ingredients");
+        String type = request.getParameter("type");
 
-	private void insertMenuItem(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+        MenuItem newMenu = new MenuItem(name, ingredients, type);
+        daoMenuItem.insertMenuItem(newMenu);
 
-		// Retrieve form data
-		String name = request.getParameter("name");
-		String ingredients = request.getParameter("ingredients");
-		String type = request.getParameter("type");
+        response.sendRedirect("main");
+    }
 
-		// Create a MenuItem object with the form data
-		MenuItem newMenu = new MenuItem(name, ingredients, type);
+    private void showUpdateForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idToUpdate = request.getParameter("idToUpdate");
+        MenuItem menuItem = daoMenuItem.getMenuItemById(idToUpdate);
+        request.setAttribute("menuItem", menuItem);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("updateMenu.jsp");
+        dispatcher.forward(request, response);
+    }
 
-		// Insert the new menu item into the database using DAOMenuItem
-		DAOMenuItem.insertMenuItem(newMenu);
+    private void updateMenuItem(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        response.setCharacterEncoding("UTF-8");
 
-		// Redirect to the main page
-		response.sendRedirect("main");
-	}
+        String idToUpdate = request.getParameter("idToUpdate");
+        String name = request.getParameter("name");
+        String ingredients = request.getParameter("ingredients");
+        String type = request.getParameter("type");
 
-	private void updateMenuItem(HttpServletRequest request, HttpServletResponse response) {
-		// Implement the logic to update a menu item
-	}
+        MenuItem updatedMenuItem = new MenuItem(name, ingredients, type);
+        updatedMenuItem.setId(idToUpdate);
 
-	private void deleteMenuItem(HttpServletRequest request, HttpServletResponse response) {
-		String idToDelete = request.getParameter("idToDelete");
+        try {
+            int itemId = Integer.parseInt(idToUpdate);
+            boolean success = daoMenuItem.updateMenuItem(itemId, updatedMenuItem);
 
-		try {
-			// Convert the id to an integer before passing it to deleteMenuItem
-			int itemId = Integer.parseInt(idToDelete);
-			DAOMenuItem.deleteMenuItem(itemId);
-			System.out.println("Item excluído com sucesso."); // Debug statement
-		} catch (NumberFormatException | SQLException e) {
-			e.printStackTrace();
-			System.err.println("Erro na exclusão do item: " + e.getMessage()); // Debug statement
-		}
+            if (success) {
+                request.setAttribute("updateSuccess", true);
+                System.out.println("Prato atualizado com sucesso.");
+            } else {
+                System.err.println("Erro na atualização do prato.");
+            }
+        } catch (NumberFormatException e) {
+            handleException(e, "Erro na atualização do prato: " + e.getMessage());
+        }
 
-		// After deletion, redirect to the main page
-		try {
-			response.sendRedirect("main");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        response.sendRedirect("main");
+    }
+
+    private void deleteMenuItem(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idToDelete = request.getParameter("idToDelete");
+
+        try {
+            int itemId = Integer.parseInt(idToDelete);
+            daoMenuItem.deleteMenuItem(itemId);
+            System.out.println("Prato excluído com sucesso.");
+        } catch (NumberFormatException | SQLException e) {
+            handleException(e, "Erro na exclusão do prato: " + e.getMessage());
+        }
+
+        response.sendRedirect("main");
+    }
+
+    private void handleSQLException(SQLException e) {
+        e.printStackTrace();
+        System.out.println("Não foi possível estabelecer conexão com o banco de dados.");
+    }
+
+    private void handleException(Exception e, String message) {
+        e.printStackTrace();
+        System.err.println(message);
+    }
 }
